@@ -13,11 +13,11 @@ char pass[] = SECRET_PASS;
 char serverAddress[] = SECRET_ADDRESS;
 
 //int send_id = 3;// Left
-//int port = 8081;// Left
+//int port = 22961;// Left
 //byte ps_data[251] = {byte(3)}; // Left
 
  int send_id = 2; //Right
- int port = 8080; // Right
+ int port = 22960; // Right
  byte ps_data[251] = {byte(2)};// Right
 
 int lines_ct = 3;
