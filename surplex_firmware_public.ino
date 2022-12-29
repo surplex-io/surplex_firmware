@@ -12,15 +12,13 @@ char pass[] = SECRET_PASS;
 
 char serverAddress[] = SECRET_ADDRESS;
 
-if (SECRET_SIDE == 0){
-  int send_id = 3;// Left
-  int port = SECRET_PORT;// Left
-  byte ps_data[251] = {byte(3)}; // Left}
-else{
-  int send_id = 2; //Right
-  int port = SECRET_PORT-1; // Right
-  byte ps_data[251] = {byte(2)};// Right
-  }
+int send_id = 3;// Left
+int port = 12100;// Left
+byte ps_data[251] = {byte(3)}; // Left}
+
+// int send_id = 2; //Right
+// int port = 12101; // Right
+// byte ps_data[251] = {byte(2)};// Right
 
 int lines_ct = 3;
 int decoders_ct = 8;
