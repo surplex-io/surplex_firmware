@@ -12,13 +12,13 @@ char pass[] = SECRET_PASS;
 
 char serverAddress[] = SECRET_ADDRESS;
 
-int send_id = 3;// Left
-int port = 12100;// Left
-byte ps_data[251] = {byte(3)}; // Left}
+//int send_id = 3;// Left
+//int port = 8081;// Left
+//byte ps_data[251] = {byte(3)}; // Left
 
-// int send_id = 2; //Right
-// int port = 12101; // Right
-// byte ps_data[251] = {byte(2)};// Right
+ int send_id = 2; //Right
+ int port = 8080; // Right
+ byte ps_data[251] = {byte(2)};// Right
 
 int lines_ct = 3;
 int decoders_ct = 8;
@@ -95,7 +95,7 @@ void setup() {
   pinMode(POT_CS, OUTPUT);
 
   SPI.begin();
-  digitalPotWrite(20);
+  digitalPotWrite(200);
   delay(1000);
 
 
