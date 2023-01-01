@@ -12,13 +12,13 @@ char pass[] = SECRET_PASS;
 
 char serverAddress[] = SECRET_ADDRESS;
 
-//int send_id = 3;// Left
-//int port = 22961;// Left
-//byte ps_data[251] = {byte(3)}; // Left
+int send_id = 3;// Left
+int port = 22961;// Left
+byte ps_data[251] = {byte(3)}; // Left
 
- int send_id = 2; //Right
- int port = 22960; // Right
- byte ps_data[251] = {byte(2)};// Right
+// int send_id = 2; //Right
+// int port = 22960; // Right
+// byte ps_data[251] = {byte(2)};// Right
 
 int lines_ct = 3;
 int decoders_ct = 8;
@@ -31,6 +31,11 @@ int col_ct1 = 1;
 int row_lines[3] = {27, 26, 25};
 int col_lines[3] = {14, 15, 13};
 int row_decoders[4] = {16, 5, 33, 32};
+
+int biggest_readout = 0;
+int step_ct = 0;
+int cur_pot = 200;
+int adjust_ct = 0;
 
 int decoding[8][3] = {
   {0, 0, 0},
@@ -95,15 +100,13 @@ void setup() {
   pinMode(POT_CS, OUTPUT);
 
   SPI.begin();
-  digitalPotWrite(200);
+  digitalPotWrite(cur_pot);
   delay(1000);
-
 
 }
 
 void loop() {
 
-  
   Serial.println("starting WebSocket client");
   client.begin();
 
@@ -195,13 +198,40 @@ void loop() {
       
     }
 
+    client.beginMessage(TYPE_BINARY);
+
+    for (int16_t j = 4 * 50; j < 4 * 50 + 50; j++) { client.write(ps_data[j]); }
+
+    client.endMessage(); 
     
-     client.beginMessage(TYPE_BINARY);
+    if (adjust_ct < 100){
 
-     for (int16_t j = 4 * 50; j < 4 * 50 + 50; j++) { client.write(ps_data[j]); }
+      for (int16_t p = 1; p < 249; p++){
+        if(ps_data[p] > 70 && ps_data[p] < 250 ){ step_ct += 1; }
+      }
 
-     client.endMessage(); 
+      for (int16_t k = 1; k < 249; k++){
+        if(ps_data[k] > biggest_readout && ps_data[k] < 253 ){ biggest_readout = ps_data[k]; }
+      }
+      
 
+      if (step_ct > 45){
+
+        if (biggest_readout < 240 && cur_pot > 30) { cur_pot = cur_pot - 10; }
+        else if (biggest_readout > 250 && cur_pot < 230) { cur_pot = cur_pot + 10; }
+        
+        adjust_ct = adjust_ct + 1;
+        digitalPotWrite(cur_pot);
+        Serial.print(adjust_ct);
+        Serial.print(",");
+        Serial.print(cur_pot);
+
+      }
+
+      biggest_readout = 0;
+      step_ct = 0;
+      
+    }
 
 
     Serial.println("");
