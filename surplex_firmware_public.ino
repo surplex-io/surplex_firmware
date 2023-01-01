@@ -6,7 +6,6 @@
 DEPLOY_IMU myIMU;
 #include <SPI.h>
 byte address=0x11;
-int POT_CS = 17;
 char ssid[] = SECRET_SSID;
 char pass[] = SECRET_PASS;
 
