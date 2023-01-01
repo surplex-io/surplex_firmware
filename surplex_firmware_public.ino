@@ -52,6 +52,12 @@ uint16_t ground_analog;
 WiFiClient wifi;
 WebSocketClient client = WebSocketClient(wifi, serverAddress, port);
 
+static const int spiClk = 1000000; // 1 MHz
+SPIClass * vspi = NULL;
+#define VSPI_MISO   MISO
+#define VSPI_MOSI   MOSI
+#define VSPI_SCLK   SCK
+#define VSPI_SS     17
 
 void setup() {
 
@@ -97,19 +103,24 @@ void setup() {
 
   pinMode(34,INPUT);
   
-  pinMode(POT_CS, OUTPUT);
+  vspi = new SPIClass(VSPI);
+  Serial.println("1");
+  vspi->begin(VSPI_SCLK, VSPI_MISO, VSPI_MOSI, VSPI_SS);
+  pinMode(vspi->pinSS(), OUTPUT);
 
-  SPI.begin();
-  digitalPotWrite(cur_pot);
+  Serial.println("2");
+  spiCommand(vspi, cur_pot);
   delay(1000);
+  Serial.println("3");
 
 }
 
 void loop() {
-
+  
   Serial.println("starting WebSocket client");
   client.begin();
 
+  
   while (client.connected()) {
     
     ps_ct = 1;
@@ -215,13 +226,13 @@ void loop() {
       }
       
 
-      if (step_ct > 45){
+      if (step_ct > 40){
 
         if (biggest_readout < 240 && cur_pot > 30) { cur_pot = cur_pot - 10; }
         else if (biggest_readout > 250 && cur_pot < 230) { cur_pot = cur_pot + 10; }
         
         adjust_ct = adjust_ct + 1;
-        digitalPotWrite(cur_pot);
+        spiCommand(vspi, cur_pot);
         Serial.print(adjust_ct);
         Serial.print(",");
         Serial.print(cur_pot);
@@ -241,12 +252,12 @@ void loop() {
   Serial.println("disconnected");
 }
 
-int digitalPotWrite(int value)
-{
-
-  digitalWrite(POT_CS, LOW); //pull SS slow to prep other end for transfer
-  SPI.transfer(B00010001);
-  SPI.transfer(value);
-  digitalWrite(POT_CS, HIGH); //pull ss high to signify end of data transfer
-
+void spiCommand(SPIClass *spi, int data) {
+  //use it as you would the regular arduino SPI API
+  spi->beginTransaction(SPISettings(spiClk, MSBFIRST, SPI_MODE0));
+  digitalWrite(spi->pinSS(), LOW); //pull SS slow to prep other end for transfer
+  spi->transfer(B00010001);
+  spi->transfer(data);
+  digitalWrite(spi->pinSS(), HIGH); //pull ss high to signify end of data transfer
+  spi->endTransaction();
 }
