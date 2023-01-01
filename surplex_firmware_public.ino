@@ -2,8 +2,8 @@
 #include <WiFi.h>
 #include <driver/adc.h>
 #include "arduino_secrets.h"
-#include "SparkFun_BNO080_Arduino_Library.h" // Click here to get the library: http://librarymanager/All#SparkFun_BNO080
-BNO080 myIMU;
+#include "SparkFun_Deploy_IMU_Library.h"
+DEPLOY_IMU myIMU;
 #include <SPI.h>
 byte address=0x11;
 int POT_CS = 17;
@@ -62,7 +62,7 @@ void setup() {
   Wire.begin();
   if (myIMU.begin() == false)
   {
-    Serial.println("BNO080 not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
+    Serial.println("IMU not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
     while (1);
   }
   Wire.setClock(400000); //Increase I2C data rate to 400kHz

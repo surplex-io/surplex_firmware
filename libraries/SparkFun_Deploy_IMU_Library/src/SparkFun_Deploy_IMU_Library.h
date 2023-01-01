@@ -125,7 +125,7 @@ const byte CHANNEL_GYRO = 5;
 #define MAX_PACKET_SIZE 128 //Packets can be up to 32k but we don't have that much RAM.
 #define MAX_METADATA_SIZE 9 //This is in words. There can be many but we mostly only care about the first 9 (Qs, range, etc)
 
-class BNO080
+class DEPLOY_IMU
 {
 public:
 	boolean begin(uint8_t deviceAddress = BNO080_DEFAULT_ADDRESS, TwoWire &wirePort = Wire, uint8_t intPin = 255); //By default use the default I2C addres, and use Wire port, and don't declare an INT pin

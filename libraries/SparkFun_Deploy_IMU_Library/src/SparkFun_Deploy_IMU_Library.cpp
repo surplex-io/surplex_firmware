@@ -22,11 +22,11 @@
 	Please see LICENSE.md for further details.
 */
 
-#include "SparkFun_BNO080_Arduino_Library.h"
+#include "SparkFun_Deploy_IMU_Library.h"
 
 //Attempt communication with the device
 //Return true if we got a 'Polo' back from Marco
-boolean BNO080::begin(uint8_t deviceAddress, TwoWire &wirePort, uint8_t intPin)
+boolean DEPLOY_IMU::begin(uint8_t deviceAddress, TwoWire &wirePort, uint8_t intPin)
 {
 	_deviceAddress = deviceAddress; //If provided, store the I2C address from user
 	_i2cPort = &wirePort;			//Grab which port the user wants us to use
@@ -78,7 +78,7 @@ boolean BNO080::begin(uint8_t deviceAddress, TwoWire &wirePort, uint8_t intPin)
 	return (false); //Something went wrong
 }
 
-boolean BNO080::beginSPI(uint8_t user_CSPin, uint8_t user_WAKPin, uint8_t user_INTPin, uint8_t user_RSTPin, uint32_t spiPortSpeed, SPIClass &spiPort)
+boolean DEPLOY_IMU::beginSPI(uint8_t user_CSPin, uint8_t user_WAKPin, uint8_t user_INTPin, uint8_t user_RSTPin, uint32_t spiPortSpeed, SPIClass &spiPort)
 {
 	_i2cPort = NULL; //This null tells the send/receive functions to use SPI
 
@@ -162,7 +162,7 @@ boolean BNO080::beginSPI(uint8_t user_CSPin, uint8_t user_WAKPin, uint8_t user_I
 
 //Calling this function with nothing sets the debug port to Serial
 //You can also call it with other streams like Serial1, SerialUSB, etc.
-void BNO080::enableDebugging(Stream &debugPort)
+void DEPLOY_IMU::enableDebugging(Stream &debugPort)
 {
 	_debugPort = &debugPort;
 	_printDebug = true;
@@ -170,12 +170,12 @@ void BNO080::enableDebugging(Stream &debugPort)
 
 //Updates the latest variables if possible
 //Returns false if new readings are not available
-bool BNO080::dataAvailable(void)
+bool DEPLOY_IMU::dataAvailable(void)
 {
 	return (getReadings() != 0);
 }
 
-uint16_t BNO080::getReadings(void)
+uint16_t DEPLOY_IMU::getReadings(void)
 {
 	//If we have an interrupt pin connection available, check if data is available.
 	//If int pin is not set, then we'll rely on receivePacket() to timeout
@@ -223,7 +223,7 @@ uint16_t BNO080::getReadings(void)
 //shtpData[5 + 6]: R6
 //shtpData[5 + 7]: R7
 //shtpData[5 + 8]: R8
-uint16_t BNO080::parseCommandReport(void)
+uint16_t DEPLOY_IMU::parseCommandReport(void)
 {
 	if (shtpData[0] == SHTP_REPORT_COMMAND_RESPONSE)
 	{
@@ -261,7 +261,7 @@ uint16_t BNO080::parseCommandReport(void)
 //shtpData[8:9]: k/accel z/gyro z/etc
 //shtpData[10:11]: real/gyro temp/etc
 //shtpData[12:13]: Accuracy estimate
-uint16_t BNO080::parseInputReport(void)
+uint16_t DEPLOY_IMU::parseInputReport(void)
 {
 	//Calculate the number of data bytes in this packet
 	int16_t dataLength = ((uint16_t)shtpHeader[1] << 8 | shtpHeader[0]);
@@ -416,7 +416,7 @@ uint16_t BNO080::parseInputReport(void)
 // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 // https://github.com/sparkfun/SparkFun_MPU-9250-DMP_Arduino_Library/issues/5#issuecomment-306509440
 // Return the roll (rotation around the x-axis) in Radians
-float BNO080::getRoll()
+float DEPLOY_IMU::getRoll()
 {
 	float dqw = getQuatReal();
 	float dqx = getQuatI();
@@ -440,7 +440,7 @@ float BNO080::getRoll()
 }
 
 // Return the pitch (rotation around the y-axis) in Radians
-float BNO080::getPitch()
+float DEPLOY_IMU::getPitch()
 {
 	float dqw = getQuatReal();
 	float dqx = getQuatI();
@@ -465,7 +465,7 @@ float BNO080::getPitch()
 }
 
 // Return the yaw / heading (rotation around the z-axis) in Radians
-float BNO080::getYaw()
+float DEPLOY_IMU::getYaw()
 {
 	float dqw = getQuatReal();
 	float dqx = getQuatI();
@@ -490,7 +490,7 @@ float BNO080::getYaw()
 
 //Gets the full quaternion
 //i,j,k,real output floats
-void BNO080::getQuat(float &i, float &j, float &k, float &real, float &radAccuracy, uint8_t &accuracy)
+void DEPLOY_IMU::getQuat(float &i, float &j, float &k, float &real, float &radAccuracy, uint8_t &accuracy)
 {
 	i = qToFloat(rawQuatI, rotationVector_Q1);
 	j = qToFloat(rawQuatJ, rotationVector_Q1);
@@ -501,7 +501,7 @@ void BNO080::getQuat(float &i, float &j, float &k, float &real, float &radAccura
 }
 
 //Return the rotation vector quaternion I
-float BNO080::getQuatI()
+float DEPLOY_IMU::getQuatI()
 {
 	float quat = qToFloat(rawQuatI, rotationVector_Q1);
 	if (_printDebug == true)
@@ -520,7 +520,7 @@ float BNO080::getQuatI()
 }
 
 //Return the rotation vector quaternion J
-float BNO080::getQuatJ()
+float DEPLOY_IMU::getQuatJ()
 {
 	float quat = qToFloat(rawQuatJ, rotationVector_Q1);
 	if (_printDebug == true)
@@ -539,7 +539,7 @@ float BNO080::getQuatJ()
 }
 
 //Return the rotation vector quaternion K
-float BNO080::getQuatK()
+float DEPLOY_IMU::getQuatK()
 {
 	float quat = qToFloat(rawQuatK, rotationVector_Q1);
 	if (_printDebug == true)
@@ -558,28 +558,28 @@ float BNO080::getQuatK()
 }
 
 //Return the rotation vector quaternion Real
-float BNO080::getQuatReal()
+float DEPLOY_IMU::getQuatReal()
 {
 	float quat = qToFloat(rawQuatReal, rotationVector_Q1);
 	return (quat);
 }
 
 //Return the rotation vector accuracy
-float BNO080::getQuatRadianAccuracy()
+float DEPLOY_IMU::getQuatRadianAccuracy()
 {
 	float quat = qToFloat(rawQuatRadianAccuracy, rotationVectorAccuracy_Q1);
 	return (quat);
 }
 
 //Return the acceleration component
-uint8_t BNO080::getQuatAccuracy()
+uint8_t DEPLOY_IMU::getQuatAccuracy()
 {
 	return (quatAccuracy);
 }
 
 //Gets the full acceleration
 //x,y,z output floats
-void BNO080::getAccel(float &x, float &y, float &z, uint8_t &accuracy)
+void DEPLOY_IMU::getAccel(float &x, float &y, float &z, uint8_t &accuracy)
 {
 	x = qToFloat(rawAccelX, accelerometer_Q1);
 	y = qToFloat(rawAccelY, accelerometer_Q1);
@@ -588,28 +588,28 @@ void BNO080::getAccel(float &x, float &y, float &z, uint8_t &accuracy)
 }
 
 //Return the acceleration component
-float BNO080::getAccelX()
+float DEPLOY_IMU::getAccelX()
 {
 	float accel = qToFloat(rawAccelX, accelerometer_Q1);
 	return (accel);
 }
 
 //Return the acceleration component
-float BNO080::getAccelY()
+float DEPLOY_IMU::getAccelY()
 {
 	float accel = qToFloat(rawAccelY, accelerometer_Q1);
 	return (accel);
 }
 
 //Return the acceleration component
-float BNO080::getAccelZ()
+float DEPLOY_IMU::getAccelZ()
 {
 	float accel = qToFloat(rawAccelZ, accelerometer_Q1);
 	return (accel);
 }
 
 //Return the acceleration component
-uint8_t BNO080::getAccelAccuracy()
+uint8_t DEPLOY_IMU::getAccelAccuracy()
 {
 	return (accelAccuracy);
 }
@@ -618,7 +618,7 @@ uint8_t BNO080::getAccelAccuracy()
 
 //Gets the full lin acceleration
 //x,y,z output floats
-void BNO080::getLinAccel(float &x, float &y, float &z, uint8_t &accuracy)
+void DEPLOY_IMU::getLinAccel(float &x, float &y, float &z, uint8_t &accuracy)
 {
 	x = qToFloat(rawLinAccelX, linear_accelerometer_Q1);
 	y = qToFloat(rawLinAccelY, linear_accelerometer_Q1);
@@ -627,35 +627,35 @@ void BNO080::getLinAccel(float &x, float &y, float &z, uint8_t &accuracy)
 }
 
 //Return the acceleration component
-float BNO080::getLinAccelX()
+float DEPLOY_IMU::getLinAccelX()
 {
 	float accel = qToFloat(rawLinAccelX, linear_accelerometer_Q1);
 	return (accel);
 }
 
 //Return the acceleration component
-float BNO080::getLinAccelY()
+float DEPLOY_IMU::getLinAccelY()
 {
 	float accel = qToFloat(rawLinAccelY, linear_accelerometer_Q1);
 	return (accel);
 }
 
 //Return the acceleration component
-float BNO080::getLinAccelZ()
+float DEPLOY_IMU::getLinAccelZ()
 {
 	float accel = qToFloat(rawLinAccelZ, linear_accelerometer_Q1);
 	return (accel);
 }
 
 //Return the acceleration component
-uint8_t BNO080::getLinAccelAccuracy()
+uint8_t DEPLOY_IMU::getLinAccelAccuracy()
 {
 	return (accelLinAccuracy);
 }
 
 //Gets the full gyro vector
 //x,y,z output floats
-void BNO080::getGyro(float &x, float &y, float &z, uint8_t &accuracy)
+void DEPLOY_IMU::getGyro(float &x, float &y, float &z, uint8_t &accuracy)
 {
 	x = qToFloat(rawGyroX, gyro_Q1);
 	y = qToFloat(rawGyroY, gyro_Q1);
@@ -664,35 +664,35 @@ void BNO080::getGyro(float &x, float &y, float &z, uint8_t &accuracy)
 }
 
 //Return the gyro component
-float BNO080::getGyroX()
+float DEPLOY_IMU::getGyroX()
 {
 	float gyro = qToFloat(rawGyroX, gyro_Q1);
 	return (gyro);
 }
 
 //Return the gyro component
-float BNO080::getGyroY()
+float DEPLOY_IMU::getGyroY()
 {
 	float gyro = qToFloat(rawGyroY, gyro_Q1);
 	return (gyro);
 }
 
 //Return the gyro component
-float BNO080::getGyroZ()
+float DEPLOY_IMU::getGyroZ()
 {
 	float gyro = qToFloat(rawGyroZ, gyro_Q1);
 	return (gyro);
 }
 
 //Return the gyro component
-uint8_t BNO080::getGyroAccuracy()
+uint8_t DEPLOY_IMU::getGyroAccuracy()
 {
 	return (gyroAccuracy);
 }
 
 //Gets the full mag vector
 //x,y,z output floats
-void BNO080::getMag(float &x, float &y, float &z, uint8_t &accuracy)
+void DEPLOY_IMU::getMag(float &x, float &y, float &z, uint8_t &accuracy)
 {
 	x = qToFloat(rawMagX, magnetometer_Q1);
 	y = qToFloat(rawMagY, magnetometer_Q1);
@@ -701,35 +701,35 @@ void BNO080::getMag(float &x, float &y, float &z, uint8_t &accuracy)
 }
 
 //Return the magnetometer component
-float BNO080::getMagX()
+float DEPLOY_IMU::getMagX()
 {
 	float mag = qToFloat(rawMagX, magnetometer_Q1);
 	return (mag);
 }
 
 //Return the magnetometer component
-float BNO080::getMagY()
+float DEPLOY_IMU::getMagY()
 {
 	float mag = qToFloat(rawMagY, magnetometer_Q1);
 	return (mag);
 }
 
 //Return the magnetometer component
-float BNO080::getMagZ()
+float DEPLOY_IMU::getMagZ()
 {
 	float mag = qToFloat(rawMagZ, magnetometer_Q1);
 	return (mag);
 }
 
 //Return the mag component
-uint8_t BNO080::getMagAccuracy()
+uint8_t DEPLOY_IMU::getMagAccuracy()
 {
 	return (magAccuracy);
 }
 
 //Gets the full high rate gyro vector
 //x,y,z output floats
-void BNO080::getFastGyro(float &x, float &y, float &z)
+void DEPLOY_IMU::getFastGyro(float &x, float &y, float &z)
 {
 	x = qToFloat(rawFastGyroX, angular_velocity_Q1);
 	y = qToFloat(rawFastGyroY, angular_velocity_Q1);
@@ -737,28 +737,28 @@ void BNO080::getFastGyro(float &x, float &y, float &z)
 }
 
 // Return the high refresh rate gyro component
-float BNO080::getFastGyroX()
+float DEPLOY_IMU::getFastGyroX()
 {
 	float gyro = qToFloat(rawFastGyroX, angular_velocity_Q1);
 	return (gyro);
 }
 
 // Return the high refresh rate gyro component
-float BNO080::getFastGyroY()
+float DEPLOY_IMU::getFastGyroY()
 {
 	float gyro = qToFloat(rawFastGyroY, angular_velocity_Q1);
 	return (gyro);
 }
 
 // Return the high refresh rate gyro component
-float BNO080::getFastGyroZ()
+float DEPLOY_IMU::getFastGyroZ()
 {
 	float gyro = qToFloat(rawFastGyroZ, angular_velocity_Q1);
 	return (gyro);
 }
 
 //Return the tap detector
-uint8_t BNO080::getTapDetector()
+uint8_t DEPLOY_IMU::getTapDetector()
 {
 	uint8_t previousTapDetector = tapDetector;
 	tapDetector = 0; //Reset so user code sees exactly one tap
@@ -766,76 +766,76 @@ uint8_t BNO080::getTapDetector()
 }
 
 //Return the step count
-uint16_t BNO080::getStepCount()
+uint16_t DEPLOY_IMU::getStepCount()
 {
 	return (stepCount);
 }
 
 //Return the stability classifier
-uint8_t BNO080::getStabilityClassifier()
+uint8_t DEPLOY_IMU::getStabilityClassifier()
 {
 	return (stabilityClassifier);
 }
 
 //Return the activity classifier
-uint8_t BNO080::getActivityClassifier()
+uint8_t DEPLOY_IMU::getActivityClassifier()
 {
 	return (activityClassifier);
 }
 
 //Return the time stamp
-uint32_t BNO080::getTimeStamp()
+uint32_t DEPLOY_IMU::getTimeStamp()
 {
 	return (timeStamp);
 }
 
 //Return raw mems value for the accel
-int16_t BNO080::getRawAccelX()
+int16_t DEPLOY_IMU::getRawAccelX()
 {
 	return (memsRawAccelX);
 }
 //Return raw mems value for the accel
-int16_t BNO080::getRawAccelY()
+int16_t DEPLOY_IMU::getRawAccelY()
 {
 	return (memsRawAccelY);
 }
 //Return raw mems value for the accel
-int16_t BNO080::getRawAccelZ()
+int16_t DEPLOY_IMU::getRawAccelZ()
 {
 	return (memsRawAccelZ);
 }
 
 //Return raw mems value for the gyro
-int16_t BNO080::getRawGyroX()
+int16_t DEPLOY_IMU::getRawGyroX()
 {
 	return (memsRawGyroX);
 }
-int16_t BNO080::getRawGyroY()
+int16_t DEPLOY_IMU::getRawGyroY()
 {
 	return (memsRawGyroY);
 }
-int16_t BNO080::getRawGyroZ()
+int16_t DEPLOY_IMU::getRawGyroZ()
 {
 	return (memsRawGyroZ);
 }
 
 //Return raw mems value for the mag
-int16_t BNO080::getRawMagX()
+int16_t DEPLOY_IMU::getRawMagX()
 {
 	return (memsRawMagX);
 }
-int16_t BNO080::getRawMagY()
+int16_t DEPLOY_IMU::getRawMagY()
 {
 	return (memsRawMagY);
 }
-int16_t BNO080::getRawMagZ()
+int16_t DEPLOY_IMU::getRawMagZ()
 {
 	return (memsRawMagZ);
 }
 
 //Given a record ID, read the Q1 value from the metaData record in the FRS (ya, it's complicated)
 //Q1 is used for all sensor data calculations
-int16_t BNO080::getQ1(uint16_t recordID)
+int16_t DEPLOY_IMU::getQ1(uint16_t recordID)
 {
 	//Q1 is always the lower 16 bits of word 7
 	uint16_t q = readFRSword(recordID, 7) & 0xFFFF; //Get word 7, lower 16 bits
@@ -844,7 +844,7 @@ int16_t BNO080::getQ1(uint16_t recordID)
 
 //Given a record ID, read the Q2 value from the metaData record in the FRS
 //Q2 is used in sensor bias
-int16_t BNO080::getQ2(uint16_t recordID)
+int16_t DEPLOY_IMU::getQ2(uint16_t recordID)
 {
 	//Q2 is always the upper 16 bits of word 7
 	uint16_t q = readFRSword(recordID, 7) >> 16; //Get word 7, upper 16 bits
@@ -853,7 +853,7 @@ int16_t BNO080::getQ2(uint16_t recordID)
 
 //Given a record ID, read the Q3 value from the metaData record in the FRS
 //Q3 is used in sensor change sensitivity
-int16_t BNO080::getQ3(uint16_t recordID)
+int16_t DEPLOY_IMU::getQ3(uint16_t recordID)
 {
 	//Q3 is always the upper 16 bits of word 8
 	uint16_t q = readFRSword(recordID, 8) >> 16; //Get word 8, upper 16 bits
@@ -861,7 +861,7 @@ int16_t BNO080::getQ3(uint16_t recordID)
 }
 
 //Given a record ID, read the resolution value from the metaData record in the FRS for a given sensor
-float BNO080::getResolution(uint16_t recordID)
+float DEPLOY_IMU::getResolution(uint16_t recordID)
 {
 	//The resolution Q value are 'the same as those used in the sensor's input report'
 	//This should be Q1.
@@ -876,7 +876,7 @@ float BNO080::getResolution(uint16_t recordID)
 }
 
 //Given a record ID, read the range value from the metaData record in the FRS for a given sensor
-float BNO080::getRange(uint16_t recordID)
+float DEPLOY_IMU::getRange(uint16_t recordID)
 {
 	//The resolution Q value are 'the same as those used in the sensor's input report'
 	//This should be Q1.
@@ -893,7 +893,7 @@ float BNO080::getRange(uint16_t recordID)
 //Given a record ID and a word number, look up the word data
 //Helpful for pulling out a Q value, range, etc.
 //Use readFRSdata for pulling out multi-word objects for a sensor (Vendor data for example)
-uint32_t BNO080::readFRSword(uint16_t recordID, uint8_t wordNumber)
+uint32_t DEPLOY_IMU::readFRSword(uint16_t recordID, uint8_t wordNumber)
 {
 	if (readFRSdata(recordID, wordNumber, 1) == true) //Get word number, just one word in length from FRS
 		return (metaData[0]);						  //Return this one word
@@ -903,7 +903,7 @@ uint32_t BNO080::readFRSword(uint16_t recordID, uint8_t wordNumber)
 
 //Ask the sensor for data from the Flash Record System
 //See 6.3.6 page 40, FRS Read Request
-void BNO080::frsReadRequest(uint16_t recordID, uint16_t readOffset, uint16_t blockSize)
+void DEPLOY_IMU::frsReadRequest(uint16_t recordID, uint16_t readOffset, uint16_t blockSize)
 {
 	shtpData[0] = SHTP_REPORT_FRS_READ_REQUEST; //FRS Read Request
 	shtpData[1] = 0;							//Reserved
@@ -921,7 +921,7 @@ void BNO080::frsReadRequest(uint16_t recordID, uint16_t readOffset, uint16_t blo
 //Given a sensor or record ID, and a given start/stop bytes, read the data from the Flash Record System (FRS) for this sensor
 //Returns true if metaData array is loaded successfully
 //Returns false if failure
-bool BNO080::readFRSdata(uint16_t recordID, uint8_t startLocation, uint8_t wordsToRead)
+bool DEPLOY_IMU::readFRSdata(uint16_t recordID, uint8_t startLocation, uint8_t wordsToRead)
 {
 	uint8_t spot = 0;
 
@@ -983,7 +983,7 @@ bool BNO080::readFRSdata(uint16_t recordID, uint8_t startLocation, uint8_t words
 //Read all advertisement packets from sensor
 //The sensor has been seen to reset twice if we attempt too much too quickly.
 //This seems to work reliably.
-void BNO080::softReset(void)
+void DEPLOY_IMU::softReset(void)
 {
 	shtpData[0] = 1; //Reset
 
@@ -1001,7 +1001,7 @@ void BNO080::softReset(void)
 
 //Set the operating mode to "On"
 //(This one is for @jerabaul29)
-void BNO080::modeOn(void)
+void DEPLOY_IMU::modeOn(void)
 {
 	shtpData[0] = 2; //On
 
@@ -1019,7 +1019,7 @@ void BNO080::modeOn(void)
 
 //Set the operating mode to "Sleep"
 //(This one is for @jerabaul29)
-void BNO080::modeSleep(void)
+void DEPLOY_IMU::modeSleep(void)
 {
 	shtpData[0] = 3; //Sleep
 
@@ -1037,7 +1037,7 @@ void BNO080::modeSleep(void)
 
 // Indicates if we've received a Reset Complete packet. Once it's been read, 
 // the state will reset to false until another Reset Complete packet is found. 
-bool BNO080::hasReset() {
+bool DEPLOY_IMU::hasReset() {
 	if (_hasReset) {
 		_hasReset = false;
 		return true;
@@ -1047,7 +1047,7 @@ bool BNO080::hasReset() {
 
 //Get the reason for the last reset
 //1 = POR, 2 = Internal reset, 3 = Watchdog, 4 = External reset, 5 = Other
-uint8_t BNO080::resetReason()
+uint8_t DEPLOY_IMU::resetReason()
 {
 	shtpData[0] = SHTP_REPORT_PRODUCT_ID_REQUEST; //Request the product ID and reset info
 	shtpData[1] = 0;							  //Reserved
@@ -1069,7 +1069,7 @@ uint8_t BNO080::resetReason()
 
 //Given a register value and a Q point, convert to float
 //See https://en.wikipedia.org/wiki/Q_(number_format)
-float BNO080::qToFloat(int16_t fixedPointValue, uint8_t qPoint)
+float DEPLOY_IMU::qToFloat(int16_t fixedPointValue, uint8_t qPoint)
 {
 	float qFloat = fixedPointValue;
 	qFloat *= pow(2, qPoint * -1);
@@ -1077,100 +1077,100 @@ float BNO080::qToFloat(int16_t fixedPointValue, uint8_t qPoint)
 }
 
 //Sends the packet to enable the rotation vector
-void BNO080::enableRotationVector(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableRotationVector(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_ROTATION_VECTOR, timeBetweenReports);
 }
 
 //Sends the packet to enable the ar/vr stabilized rotation vector
-void BNO080::enableARVRStabilizedRotationVector(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableARVRStabilizedRotationVector(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_AR_VR_STABILIZED_ROTATION_VECTOR, timeBetweenReports);
 }
 
 //Sends the packet to enable the rotation vector
-void BNO080::enableGameRotationVector(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableGameRotationVector(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_GAME_ROTATION_VECTOR, timeBetweenReports);
 }
 
 //Sends the packet to enable the ar/vr stabilized rotation vector
-void BNO080::enableARVRStabilizedGameRotationVector(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableARVRStabilizedGameRotationVector(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_AR_VR_STABILIZED_GAME_ROTATION_VECTOR, timeBetweenReports);
 }
 
 //Sends the packet to enable the accelerometer
-void BNO080::enableAccelerometer(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableAccelerometer(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_ACCELEROMETER, timeBetweenReports);
 }
 
 //Sends the packet to enable the accelerometer
-void BNO080::enableLinearAccelerometer(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableLinearAccelerometer(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_LINEAR_ACCELERATION, timeBetweenReports);
 }
 
 //Sends the packet to enable the gyro
-void BNO080::enableGyro(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableGyro(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_GYROSCOPE, timeBetweenReports);
 }
 
 //Sends the packet to enable the magnetometer
-void BNO080::enableMagnetometer(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableMagnetometer(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_MAGNETIC_FIELD, timeBetweenReports);
 }
 
 //Sends the packet to enable the high refresh-rate gyro-integrated rotation vector
-void BNO080::enableGyroIntegratedRotationVector(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableGyroIntegratedRotationVector(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_GYRO_INTEGRATED_ROTATION_VECTOR, timeBetweenReports);
 }
 
 //Sends the packet to enable the tap detector
-void BNO080::enableTapDetector(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableTapDetector(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_TAP_DETECTOR, timeBetweenReports);
 }
 
 //Sends the packet to enable the step counter
-void BNO080::enableStepCounter(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableStepCounter(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_STEP_COUNTER, timeBetweenReports);
 }
 
 //Sends the packet to enable the Stability Classifier
-void BNO080::enableStabilityClassifier(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableStabilityClassifier(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_STABILITY_CLASSIFIER, timeBetweenReports);
 }
 
 //Sends the packet to enable the raw accel readings
 //Note you must enable basic reporting on the sensor as well
-void BNO080::enableRawAccelerometer(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableRawAccelerometer(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_RAW_ACCELEROMETER, timeBetweenReports);
 }
 
 //Sends the packet to enable the raw accel readings
 //Note you must enable basic reporting on the sensor as well
-void BNO080::enableRawGyro(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableRawGyro(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_RAW_GYROSCOPE, timeBetweenReports);
 }
 
 //Sends the packet to enable the raw accel readings
 //Note you must enable basic reporting on the sensor as well
-void BNO080::enableRawMagnetometer(uint16_t timeBetweenReports)
+void DEPLOY_IMU::enableRawMagnetometer(uint16_t timeBetweenReports)
 {
 	setFeatureCommand(SENSOR_REPORTID_RAW_MAGNETOMETER, timeBetweenReports);
 }
 
 //Sends the packet to enable the various activity classifiers
-void BNO080::enableActivityClassifier(uint16_t timeBetweenReports, uint32_t activitiesToEnable, uint8_t (&activityConfidences)[9])
+void DEPLOY_IMU::enableActivityClassifier(uint16_t timeBetweenReports, uint32_t activitiesToEnable, uint8_t (&activityConfidences)[9])
 {
 	_activityConfidences = activityConfidences; //Store pointer to array
 
@@ -1178,43 +1178,43 @@ void BNO080::enableActivityClassifier(uint16_t timeBetweenReports, uint32_t acti
 }
 
 //Sends the commands to begin calibration of the accelerometer
-void BNO080::calibrateAccelerometer()
+void DEPLOY_IMU::calibrateAccelerometer()
 {
 	sendCalibrateCommand(CALIBRATE_ACCEL);
 }
 
 //Sends the commands to begin calibration of the gyro
-void BNO080::calibrateGyro()
+void DEPLOY_IMU::calibrateGyro()
 {
 	sendCalibrateCommand(CALIBRATE_GYRO);
 }
 
 //Sends the commands to begin calibration of the magnetometer
-void BNO080::calibrateMagnetometer()
+void DEPLOY_IMU::calibrateMagnetometer()
 {
 	sendCalibrateCommand(CALIBRATE_MAG);
 }
 
 //Sends the commands to begin calibration of the planar accelerometer
-void BNO080::calibratePlanarAccelerometer()
+void DEPLOY_IMU::calibratePlanarAccelerometer()
 {
 	sendCalibrateCommand(CALIBRATE_PLANAR_ACCEL);
 }
 
 //See 2.2 of the Calibration Procedure document 1000-4044
-void BNO080::calibrateAll()
+void DEPLOY_IMU::calibrateAll()
 {
 	sendCalibrateCommand(CALIBRATE_ACCEL_GYRO_MAG);
 }
 
-void BNO080::endCalibration()
+void DEPLOY_IMU::endCalibration()
 {
 	sendCalibrateCommand(CALIBRATE_STOP); //Disables all calibrations
 }
 
 //See page 51 of reference manual - ME Calibration Response
 //Byte 5 is parsed during the readPacket and stored in calibrationStatus
-boolean BNO080::calibrationComplete()
+boolean DEPLOY_IMU::calibrationComplete()
 {
 	if (calibrationStatus == 0)
 		return (true);
@@ -1222,14 +1222,14 @@ boolean BNO080::calibrationComplete()
 }
 
 //Given a sensor's report ID, this tells the BNO080 to begin reporting the values
-void BNO080::setFeatureCommand(uint8_t reportID, uint16_t timeBetweenReports)
+void DEPLOY_IMU::setFeatureCommand(uint8_t reportID, uint16_t timeBetweenReports)
 {
 	setFeatureCommand(reportID, timeBetweenReports, 0); //No specific config
 }
 
 //Given a sensor's report ID, this tells the BNO080 to begin reporting the values
 //Also sets the specific config word. Useful for personal activity classifier
-void BNO080::setFeatureCommand(uint8_t reportID, uint16_t timeBetweenReports, uint32_t specificConfig)
+void DEPLOY_IMU::setFeatureCommand(uint8_t reportID, uint16_t timeBetweenReports, uint32_t specificConfig)
 {
 	long microsBetweenReports = (long)timeBetweenReports * 1000L;
 
@@ -1258,7 +1258,7 @@ void BNO080::setFeatureCommand(uint8_t reportID, uint16_t timeBetweenReports, ui
 //Tell the sensor to do a command
 //See 6.3.8 page 41, Command request
 //The caller is expected to set P0 through P8 prior to calling
-void BNO080::sendCommand(uint8_t command)
+void DEPLOY_IMU::sendCommand(uint8_t command)
 {
 	shtpData[0] = SHTP_REPORT_COMMAND_REQUEST; //Command Request
 	shtpData[1] = commandSequenceNumber++;	 //Increments automatically each function call
@@ -1281,7 +1281,7 @@ void BNO080::sendCommand(uint8_t command)
 
 //This tells the BNO080 to begin calibrating
 //See page 50 of reference manual and the 1000-4044 calibration doc
-void BNO080::sendCalibrateCommand(uint8_t thingToCalibrate)
+void DEPLOY_IMU::sendCalibrateCommand(uint8_t thingToCalibrate)
 {
 	/*shtpData[3] = 0; //P0 - Accel Cal Enable
 	shtpData[4] = 0; //P1 - Gyro Cal Enable
@@ -1322,7 +1322,7 @@ void BNO080::sendCalibrateCommand(uint8_t thingToCalibrate)
 
 //Request ME Calibration Status from BNO080
 //See page 51 of reference manual
-void BNO080::requestCalibrationStatus()
+void DEPLOY_IMU::requestCalibrationStatus()
 {
 	/*shtpData[3] = 0; //P0 - Reserved
 	shtpData[4] = 0; //P1 - Reserved
@@ -1345,7 +1345,7 @@ void BNO080::requestCalibrationStatus()
 
 //This tells the BNO080 to save the Dynamic Calibration Data (DCD) to flash
 //See page 49 of reference manual and the 1000-4044 calibration doc
-void BNO080::saveCalibration()
+void DEPLOY_IMU::saveCalibration()
 {
 	/*shtpData[3] = 0; //P0 - Reserved
 	shtpData[4] = 0; //P1 - Reserved
@@ -1366,7 +1366,7 @@ void BNO080::saveCalibration()
 
 //Wait a certain time for incoming I2C bytes before giving up
 //Returns false if failed
-boolean BNO080::waitForI2C()
+boolean DEPLOY_IMU::waitForI2C()
 {
 	for (uint8_t counter = 0; counter < 100; counter++) //Don't got more than 255
 	{
@@ -1383,7 +1383,7 @@ boolean BNO080::waitForI2C()
 //Blocking wait for BNO080 to assert (pull low) the INT pin
 //indicating it's ready for comm. Can take more than 104ms
 //after a hardware reset
-boolean BNO080::waitForSPI()
+boolean DEPLOY_IMU::waitForSPI()
 {
 	for (uint8_t counter = 0; counter < 125; counter++) //Don't got more than 255
 	{
@@ -1401,7 +1401,7 @@ boolean BNO080::waitForSPI()
 
 //Check to see if there is any new data available
 //Read the contents of the incoming packet into the shtpData array
-boolean BNO080::receivePacket(void)
+boolean DEPLOY_IMU::receivePacket(void)
 {
 	if (_i2cPort == NULL) //Do SPI
 	{
@@ -1508,7 +1508,7 @@ boolean BNO080::receivePacket(void)
 //Sends multiple requests to sensor until all data bytes are received from sensor
 //The shtpData buffer has max capacity of MAX_PACKET_SIZE. Any bytes over this amount will be lost.
 //Arduino I2C read limit is 32 bytes. Header is 4 bytes, so max data we can read per interation is 28 bytes
-boolean BNO080::getData(uint16_t bytesRemaining)
+boolean DEPLOY_IMU::getData(uint16_t bytesRemaining)
 {
 	uint16_t dataSpot = 0; //Start at the beginning of shtpData array
 
@@ -1550,7 +1550,7 @@ boolean BNO080::getData(uint16_t bytesRemaining)
 //Given the data packet, send the header then the data
 //Returns false if sensor does not ACK
 //TODO - Arduino has a max 32 byte send. Break sending into multi packets if needed.
-boolean BNO080::sendPacket(uint8_t channelNumber, uint8_t dataLength)
+boolean DEPLOY_IMU::sendPacket(uint8_t channelNumber, uint8_t dataLength)
 {
 	uint8_t packetLength = dataLength + 4; //Add four bytes for the header
 
@@ -1615,7 +1615,7 @@ boolean BNO080::sendPacket(uint8_t channelNumber, uint8_t dataLength)
 }
 
 //Pretty prints the contents of the current shtp header and data packets
-void BNO080::printPacket(void)
+void DEPLOY_IMU::printPacket(void)
 {
 	if (_printDebug == true)
 	{
@@ -1674,7 +1674,7 @@ void BNO080::printPacket(void)
 }
 
 //Pretty prints the contents of the current shtp header (only)
-void BNO080::printHeader(void)
+void DEPLOY_IMU::printHeader(void)
 {
 	if (_printDebug == true)
 	{
