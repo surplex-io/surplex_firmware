@@ -11,13 +11,13 @@ char pass[] = SECRET_PASS;
 
 char serverAddress[] = SECRET_ADDRESS;
 
-int send_id = 3;// Left
-int port = 22961;// Left
-byte ps_data[251] = {byte(3)}; // Left
+//int send_id = 3;// Left
+//int port = 22961;// Left
+//byte ps_data[251] = {byte(3)}; // Left
 
-// int send_id = 2; //Right
-// int port = 22960; // Right
-// byte ps_data[251] = {byte(2)};// Right
+ int send_id = 2; //Right
+ int port = 22960; // Right
+ byte ps_data[251] = {byte(2)};// Right
 
 int lines_ct = 3;
 int decoders_ct = 8;
@@ -106,14 +106,10 @@ void setup() {
   pinMode(34,INPUT);
   
   vspi = new SPIClass(VSPI);
-  Serial.println("1");
   vspi->begin(VSPI_SCLK, VSPI_MISO, VSPI_MOSI, VSPI_SS);
   pinMode(vspi->pinSS(), OUTPUT);
-
-  Serial.println("2");
   spiCommand(vspi, cur_pot);
   delay(1000);
-  Serial.println("3");
 
 }
 
@@ -210,7 +206,8 @@ void loop() {
       digitalWrite(row_decoders[j], HIGH);
       
     }
-    
+
+    // 125 for Low Battery Notification
     battery_level = adc1_get_raw(ADC1_CHANNEL_3);
     ps_data[249] = map(battery_level, 0, 4095, 0, 255);
     
