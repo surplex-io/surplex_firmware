@@ -48,6 +48,7 @@ int decoding[8][3] = {
 };
 
 uint16_t ground_analog;
+uint16_t battery_level;
 WiFiClient wifi;
 WebSocketClient client = WebSocketClient(wifi, serverAddress, port);
 
@@ -63,7 +64,9 @@ void setup() {
   Serial.begin(115200);
   adc1_config_width(ADC_WIDTH_BIT_12);
   adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_11);
-  
+  adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
+  adc1_config_channel_atten(ADC1_CHANNEL_6, ADC_ATTEN_DB_11);
+
   Wire.begin();
   if (myIMU.begin() == false)
   {
@@ -207,7 +210,10 @@ void loop() {
       digitalWrite(row_decoders[j], HIGH);
       
     }
-
+    
+    battery_level = adc1_get_raw(ADC1_CHANNEL_3);
+    ps_data[249] = map(battery_level, 0, 4095, 0, 255);
+    
     client.beginMessage(TYPE_BINARY);
 
     for (int16_t j = 4 * 50; j < 4 * 50 + 50; j++) { client.write(ps_data[j]); }
