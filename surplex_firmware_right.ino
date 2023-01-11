@@ -28,7 +28,7 @@ int row_ct1 = 4;
 int col_ct1 = 1;
 
 int row_lines[3] = {27, 26, 25};
-int col_lines[3] = {14, 15, 13};
+int col_lines[3] = {12, 15, 13};
 int row_decoders[4] = {16, 5, 33, 32};
 
 int biggest_readout = 0;
