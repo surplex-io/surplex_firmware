@@ -223,7 +223,7 @@ void loop() {
 
     // 125 for Low Battery Notification
     battery_level = map(adc1_get_raw(ADC1_CHANNEL_3), 0, 4095, 0, 255);
-    warning_level = map(battery_level, 120, 150, 0, 255)
+    warning_level = map(battery_level, 120, 150, 0, 255);
     setColor(255-warning_level, warning_level, 0);
     
     ps_data[249] = battery_level;
