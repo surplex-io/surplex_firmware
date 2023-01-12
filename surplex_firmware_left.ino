@@ -11,13 +11,17 @@ char pass[] = SECRET_PASS;
 
 char serverAddress[] = SECRET_ADDRESS;
 
-//int send_id = 3;// Left
-//int port = 22961;// Left
-//byte ps_data[251] = {byte(3)}; // Left
+int send_id = 3;// Left
+int port = 22961;// Left
+byte ps_data[251] = {byte(3)}; // Left
 
-int send_id = 2; //Right
-int port = 22960; // Right
-byte ps_data[251] = {byte(2)};// Right
+// int send_id = 2; //Right
+// int port = 22960; // Right
+// byte ps_data[251] = {byte(2)};// Right
+
+int redPin = 14; 
+int greenPin = 19; 
+int bluePin = 4;
 
 int lines_ct = 3;
 int decoders_ct = 8;
@@ -49,6 +53,8 @@ int decoding[8][3] = {
 
 uint16_t ground_analog;
 uint16_t battery_level;
+uint16_t warning_level;
+
 WiFiClient wifi;
 WebSocketClient client = WebSocketClient(wifi, serverAddress, port);
 
@@ -60,6 +66,12 @@ SPIClass * vspi = NULL;
 #define VSPI_SS     17
 
 void setup() {
+  
+  pinMode(redPin, OUTPUT);  
+  pinMode(greenPin, OUTPUT);  
+  pinMode(bluePin, OUTPUT); 
+
+  setColor(255, 255, 0);
 
   Serial.begin(115200);
   adc1_config_width(ADC_WIDTH_BIT_12);
@@ -90,6 +102,8 @@ void setup() {
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
+  
+  setColor(0, 255, 0);
 
   for (int i = 0; i < lines_ct; i++) {
     pinMode(col_lines[i], OUTPUT);
@@ -208,8 +222,11 @@ void loop() {
     }
 
     // 125 for Low Battery Notification
-    battery_level = adc1_get_raw(ADC1_CHANNEL_3);
-    ps_data[249] = map(battery_level, 0, 4095, 0, 255);
+    battery_level = map(adc1_get_raw(ADC1_CHANNEL_3), 0, 4095, 0, 255);
+    warning_level = map(battery_level, 120, 150, 0, 255)
+    setColor(255-warning_level, warning_level, 0);
+    
+    ps_data[249] = battery_level;
     
     client.beginMessage(TYPE_BINARY);
 
@@ -246,7 +263,6 @@ void loop() {
       
     }
 
-
     Serial.println("");
     
   }
@@ -263,3 +279,10 @@ void spiCommand(SPIClass *spi, int data) {
   digitalWrite(spi->pinSS(), HIGH); //pull ss high to signify end of data transfer
   spi->endTransaction();
 }
+
+
+void setColor(int red, int green, int blue) {  
+    analogWrite(redPin, 255-red);  
+    analogWrite(greenPin, 255-green);  
+    analogWrite(bluePin, 255-blue);   
+}  
