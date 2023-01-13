@@ -57,7 +57,7 @@ void setup() {
 
   digitalWrite(redPin, 0);  
   digitalWrite(greenPin, 0);  
-  digitalWrite(bluePin, 255);  
+  digitalWrite(bluePin, 1);  
   
   Serial.begin(460800);
   adc1_config_width(ADC_WIDTH_BIT_12);
@@ -75,10 +75,6 @@ void setup() {
 
   myIMU.enableLinearAccelerometer(1);  // m/s^2 no gravity
   myIMU.enableGyroIntegratedRotationVector(1); // quat
-
-  digitalWrite(redPin, 0);  
-  digitalWrite(greenPin, 255);  
-  digitalWrite(bluePin, 255);
   
   for (int i = 0; i < lines_ct; i++) {
     pinMode(col_lines[i], OUTPUT);
@@ -187,7 +183,7 @@ void loop() {
     // 125 for Low Battery Notification
     battery_level = map(adc1_get_raw(ADC1_CHANNEL_3), 0, 4095, 0, 255);
     warning_level = map(battery_level, 120, 150, 0, 255);
-    setColor(255-warning_level, warning_level, 0);
+    setColor(255-warning_level, warning_level,   0);
     ps_data[249] = battery_level; 
 
     for (int16_t h = 0; h < 250; h++) { 
