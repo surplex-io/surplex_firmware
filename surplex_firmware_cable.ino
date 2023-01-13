@@ -26,6 +26,7 @@ int step_ct = 0;
 int cur_pot = 200;
 int adjust_ct = 0;
 
+
 int decoding[8][3] = {
   {0, 0, 0},
   {1, 0, 0},
@@ -54,9 +55,11 @@ void setup() {
   pinMode(greenPin, OUTPUT);  
   pinMode(bluePin, OUTPUT); 
 
-  setColor(255, 255, 0);
-
-  Serial.begin(921600);
+  digitalWrite(redPin, 0);  
+  digitalWrite(greenPin, 0);  
+  digitalWrite(bluePin, 255);  
+  
+  Serial.begin(460800);
   adc1_config_width(ADC_WIDTH_BIT_12);
   adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_11);
   adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
@@ -73,8 +76,10 @@ void setup() {
   myIMU.enableLinearAccelerometer(1);  // m/s^2 no gravity
   myIMU.enableGyroIntegratedRotationVector(1); // quat
 
-  setColor(255, 0, 0);
-
+  digitalWrite(redPin, 0);  
+  digitalWrite(greenPin, 255);  
+  digitalWrite(bluePin, 255);
+  
   for (int i = 0; i < lines_ct; i++) {
     pinMode(col_lines[i], OUTPUT);
     pinMode(row_lines[i], OUTPUT);
@@ -99,6 +104,7 @@ void setup() {
 
 void loop() {
   
+  delay(1000);
   Serial.println("Starting..");
   
   while (true) {
@@ -181,8 +187,7 @@ void loop() {
     // 125 for Low Battery Notification
     battery_level = map(adc1_get_raw(ADC1_CHANNEL_3), 0, 4095, 0, 255);
     warning_level = map(battery_level, 120, 150, 0, 255);
-//    warning_level = 255;
-//    setColor(255-warning_level, warning_level, 0);
+    setColor(255-warning_level, warning_level, 0);
     ps_data[249] = battery_level; 
 
     for (int16_t h = 0; h < 250; h++) { 
