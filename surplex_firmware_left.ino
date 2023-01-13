@@ -73,7 +73,7 @@ void setup() {
 
   digitalWrite(redPin, 0);  
   digitalWrite(greenPin, 0);  
-  digitalWrite(bluePin, 255);  
+  digitalWrite(bluePin, 1);  
 
   Serial.begin(115200);
   adc1_config_width(ADC_WIDTH_BIT_12);
@@ -104,10 +104,6 @@ void setup() {
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
-  
-  digitalWrite(redPin, 255);  
-  digitalWrite(greenPin, 0);  
-  digitalWrite(bluePin, 255);
 
   for (int i = 0; i < lines_ct; i++) {
     pinMode(col_lines[i], OUTPUT);
