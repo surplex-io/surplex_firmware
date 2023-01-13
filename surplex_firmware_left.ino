@@ -71,7 +71,9 @@ void setup() {
   pinMode(greenPin, OUTPUT);  
   pinMode(bluePin, OUTPUT); 
 
-  setColor(255, 255, 0);
+  digitalWrite(redPin, 0);  
+  digitalWrite(greenPin, 0);  
+  digitalWrite(bluePin, 255);  
 
   Serial.begin(115200);
   adc1_config_width(ADC_WIDTH_BIT_12);
@@ -103,7 +105,9 @@ void setup() {
   Serial.print("IP Address: ");
   Serial.println(ip);
   
-  setColor(0, 255, 0);
+  digitalWrite(redPin, 255);  
+  digitalWrite(greenPin, 0);  
+  digitalWrite(bluePin, 255);
 
   for (int i = 0; i < lines_ct; i++) {
     pinMode(col_lines[i], OUTPUT);
